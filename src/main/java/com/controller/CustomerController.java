@@ -1,13 +1,11 @@
 package com.controller;
 
 import com.model.Customer;
+import com.service.ICustomerService;
 import com.service.customer.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -18,25 +16,35 @@ public class CustomerController {
 
     private CustomerService customerService = new CustomerService();
 
-    @GetMapping
-    public ModelAndView showList() {
-        ModelAndView modelAndView = new ModelAndView("customers/list");
-        List<Customer> customers = customerService.findAll();
-        modelAndView.addObject("customers", customers);
-        return modelAndView;
-    }
+    @Controller
+    @RequestMapping("/customers")
+    public class customerController {
+        @Autowired
+        private ICustomerService customerService;
 
-    @GetMapping("{id}")
-    public ModelAndView showInformation(@PathVariable Long id) {
-        ModelAndView modelAndView = new ModelAndView("customers/info");
-        Customer customer = customerService.findOne(id);
-        modelAndView.addObject("customer", customer);
-        return modelAndView;
-    }
+        @GetMapping()
+        public ModelAndView getAllStudent() {
+            ModelAndView modelAndView = new ModelAndView("/customer/list");
+            List<Customer> customers = customerService.findAll();
+            modelAndView.addObject("customers", customers);
+            return modelAndView;
+        }
 
-    @PostMapping
-    public String updateCustomer(Customer customer) {
-        customerService.save(customer);
-        return "redirect:/customers";
+        @GetMapping("/create")
+        public ModelAndView showFormCreateStudent() {
+            ModelAndView modelAndView = new ModelAndView("/customer/create");
+            modelAndView.addObject("customer", new Customer());
+            return modelAndView;
+        }
+
+        @PostMapping("/create")
+        public ModelAndView createStudent(@ModelAttribute Customer customer) {
+            ModelAndView modelAndView = new ModelAndView("/customer/create");
+            customerService.save(customer);
+            modelAndView.addObject("mess", "Tao moi thanh cong");
+            return modelAndView;
+
+
+        }
     }
 }
